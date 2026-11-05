@@ -1,0 +1,4 @@
+import { db } from '@/lib/db'
+import { requireRole, fail } from '@/lib/http'
+import { NextResponse } from 'next/server'
+export async function GET(req: Request) { const a = await requireRole('GERENTE'); if ('error' in a) return a.error; const q = new URL(req.url).searchParams; const month = q.get('month'); const localId = q.get('localId'); if (!month || !/^\d{4}-\d{2}$/.test(month)) return fail('Mês inválido.'); const start = new Date(`${month}-01T12:00:00Z`); const end = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1, 12)); return NextResponse.json(await db.reserva.findMany({ where: { data: { gte: start, lt: end }, ...(localId ? { localId } : {}) }, include: { local: { select: { nome: true } }, usuario: { select: { nome: true, email: true } } }, orderBy: [{ data: 'asc' }, { turno: 'asc' }] })) }

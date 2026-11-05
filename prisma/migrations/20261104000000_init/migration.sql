@@ -1,0 +1,11 @@
+CREATE TYPE "Papel" AS ENUM ('USUARIO', 'GERENTE');
+CREATE TYPE "TipoLocal" AS ENUM ('AUDITORIO', 'SALA');
+CREATE TYPE "Turno" AS ENUM ('MANHA', 'TARDE', 'NOITE');
+CREATE TYPE "Status" AS ENUM ('PENDENTE', 'AGENDADO', 'CANCELADA');
+CREATE TABLE "User" ("id" TEXT PRIMARY KEY, "nome" TEXT NOT NULL, "email" TEXT NOT NULL UNIQUE, "matricula" TEXT NOT NULL UNIQUE, "dataNascimento" DATE NOT NULL, "senhaHash" TEXT NOT NULL, "papel" "Papel" NOT NULL, "cpf" TEXT UNIQUE, "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE "Local" ("id" TEXT PRIMARY KEY, "nome" TEXT NOT NULL, "tipo" "TipoLocal" NOT NULL, "ativo" BOOLEAN NOT NULL DEFAULT true);
+CREATE TABLE "Feriado" ("id" TEXT PRIMARY KEY, "data" DATE NOT NULL UNIQUE, "descricao" TEXT NOT NULL);
+CREATE TABLE "Reserva" ("id" TEXT PRIMARY KEY, "usuarioId" TEXT NOT NULL REFERENCES "User"("id"), "localId" TEXT NOT NULL REFERENCES "Local"("id"), "nomeEvento" TEXT NOT NULL, "data" DATE NOT NULL, "turno" "Turno" NOT NULL, "status" "Status" NOT NULL DEFAULT 'PENDENTE', "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "atualizadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX "Reserva_localId_data_idx" ON "Reserva"("localId", "data");
+CREATE INDEX "Reserva_usuarioId_criadoEm_idx" ON "Reserva"("usuarioId", "criadoEm");
+CREATE UNIQUE INDEX "Reserva_ativa_unica" ON "Reserva"("localId", "data", "turno") WHERE "status" IN ('PENDENTE', 'AGENDADO');

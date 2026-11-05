@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+enum Papel {
+  USUARIO
+  GERENTE
+}
+enum TipoLocal {
+  AUDITORIO
+  SALA
+}
+enum Turno {
+  MANHA
+  TARDE
+  NOITE
+}
+enum Status {
+  PENDENTE
+  AGENDADO
+  CANCELADA
+}
+model User {
+  id String @id @default(cuid())
+  nome String
+  email String @unique
+  matricula String @unique
+  dataNascimento DateTime @db.Date
+  senhaHash String
+  papel Papel
+  cpf String? @unique
+  criadoEm DateTime @default(now())
+  reservas Reserva[]
+}
+model Local {
+  id String @id @default(cuid())
+  nome String
+  tipo TipoLocal
+  ativo Boolean @default(true)
+  reservas Reserva[]
+}
+model Feriado {
+  id String @id @default(cuid())
+  data DateTime @unique @db.Date
+  descricao String
+}
+model Reserva {
+  id String @id @default(cuid())
+  usuarioId String
+  usuario User @relation(fields: [usuarioId], references: [id])
+  localId String
+  local Local @relation(fields: [localId], references: [id])
+  nomeEvento String
+  data DateTime @db.Date
+  turno Turno
+  status Status @default(PENDENTE)
+  criadoEm DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  @@index([localId, data])
+  @@index([usuarioId, criadoEm])
+}

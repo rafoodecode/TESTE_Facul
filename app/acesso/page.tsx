@@ -23,10 +23,6 @@ export default function Access() {
     const values = Object.fromEntries(new FormData(e.currentTarget))
     try {
       const result = await api(register ? '/auth/register' : '/auth/login', 'POST', register ? { ...values, papel } : values)
-      if (!register && result.papel !== papel) {
-        await api('/auth/logout', 'POST')
-        throw new Error('Esta conta pertence a outro perfil. Selecione o perfil correto.')
-      }
       location.href = result.papel === 'USUARIO' ? '/usuario' : '/gerente'
     } catch (err) { setMessage((err as Error).message) }
   }
@@ -40,7 +36,7 @@ export default function Access() {
           {register && <div className="grid md:grid-cols-2 gap-3"><label>Nome completo<input name="nome" required className="block w-full mt-1" /></label><label>Matrícula<input name="matricula" required className="block w-full mt-1" /></label><label>Data de nascimento<input type="date" name="dataNascimento" required className="block w-full mt-1" /></label>{papel === 'GERENTE' && <><label>CPF<input name="cpf" required className="block w-full mt-1" /></label><label>Código de convite, se exigido<input name="convite" className="block w-full mt-1" /></label></>}</div>}
           <label className="text-xs font-bold">E-mail institucional<input type="email" name="email" placeholder="nome@instituicao.edu.br" required className="block w-full mt-1 font-normal" /><span className="block mt-1 text-[11px] font-normal text-slate-500">Utilize o domínio institucional autorizado.</span></label>
           <div className="text-xs font-bold"><label htmlFor="access-password">Senha de Acesso</label><div className="flex mt-1"><input id="access-password" type={showPassword ? 'text' : 'password'} name="senha" minLength={register ? 12 : undefined} required className="w-full font-normal rounded-r-none" /><button type="button" className="border border-l-0 border-slate-400 rounded-l-none text-slate-600" aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'} onClick={() => setShowPassword(v => !v)}>{showPassword ? '◉' : '◎'}</button></div></div>
-          <div><p className="text-[10px] font-extrabold uppercase tracking-wide mb-2">Selecione o perfil de destino para entrar</p><div className={`grid ${register ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'} gap-2`}>{profiles.filter(p => !register || p.role !== 'ADMIN_GERAL').map(p => <button key={p.role} type="button" disabled={!ready} onClick={() => setPapel(p.role)} className={`text-left border p-3 ${papel === p.role ? 'border-[#075481] bg-[#edf5fb]' : 'border-slate-200'}`}><strong className="block text-sm">{p.title}</strong><span className="text-[11px]">{p.description}</span></button>)}</div>{!register && <p className="text-[11px] text-slate-500 mt-2">O administrador geral é criado pela equipe responsável, sem cadastro público.</p>}</div>
+          {register ? <div><p className="text-[10px] font-extrabold uppercase tracking-wide mb-2">Selecione o perfil para cadastro</p><div className="grid grid-cols-2 gap-2">{profiles.filter(p => p.role !== 'ADMIN_GERAL').map(p => <button key={p.role} type="button" disabled={!ready} onClick={() => setPapel(p.role)} className={`text-left border p-3 ${papel === p.role ? 'border-[#075481] bg-[#edf5fb]' : 'border-slate-200'}`}><strong className="block text-sm">{p.title}</strong><span className="text-[11px]">{p.description}</span></button>)}</div></div> : <p className="text-xs text-slate-600">O perfil de acesso, inclusive Admin Geral, é identificado automaticamente pelo e-mail e senha.</p>}
           <button disabled={!ready} className="primary w-full">{register ? 'Cadastrar' : 'Entrar'}</button>
         </form>{message && <p role="alert" className="mt-4 text-red-700 text-sm">{message}</p>}
       </div>

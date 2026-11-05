@@ -15,6 +15,10 @@ npm run dev
 
 Abra `http://localhost:3000`. Para testar: `npm test` e `npm run test:e2e`. O teste Playwright exige banco migrado, seed e Google Chrome instalado (canal `chrome` em `playwright.config.ts`). `npm run build` verifica o projeto. Para usar Chromium empacotado pelo Playwright, instale-o com `npx playwright install chromium` e remova o canal da configuração.
 
+## Publicação para testes
+
+No Vercel, conecte o repositório GitHub e o banco Neon Free ao projeto. O banco criado para esta implantação se chama `teste-facul-db` e fica na região de São Paulo. Use a URL agrupada do Neon como `DATABASE_URL` para a aplicação. Antes de liberar o endereço de testes, configure `SESSION_SECRET` com um valor aleatório de 32 ou mais caracteres, `INSTITUTIONAL_EMAIL_DOMAIN` e um `MANAGER_INVITE_CODE` privado. Execute `npm run db:deploy` e `npm run db:seed` uma vez contra o banco hospedado; a migração não deve depender do processo de build. Configure `SEED_PASSWORD` com uma senha de demonstração temporária e troque-a antes de compartilhar as contas. As credenciais e o arquivo `.env` não entram no Git.
+
 ## Variáveis de ambiente
 
 `DATABASE_URL`: PostgreSQL. `SESSION_SECRET`: segredo aleatório com 32+ caracteres. `INSTITUTIONAL_EMAIL_DOMAIN`: domínio permitido, sem `@`; sem configuração aceita qualquer e-mail válido. `MANAGER_INVITE_CODE`: opcional, desligado por padrão conforme especificação. Em produção, configure-o antes de abrir cadastro público. `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`: SMTP; sem host, e-mails são registrados no console. `SEED_PASSWORD`: senha das contas de demonstração.

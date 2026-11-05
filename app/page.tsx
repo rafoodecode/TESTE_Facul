@@ -1,3 +1,3 @@
 import { redirect } from 'next/navigation'
 import { currentUser } from '@/lib/auth'
-export default async function Home() { const user = await currentUser(); redirect(user ? user.papel === 'GERENTE' ? '/gerente' : '/usuario' : '/acesso') }
+export default async function Home() { const user = await currentUser(); redirect(user ? user.papel === 'USUARIO' ? '/usuario' : '/gerente' : '/acesso') }

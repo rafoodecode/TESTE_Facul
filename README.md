@@ -25,6 +25,8 @@ O ambiente de testes está em [teste-facul.vercel.app](https://teste-facul.verce
 
 `DATABASE_URL`: PostgreSQL. `SESSION_SECRET`: segredo aleatório com 32+ caracteres. `INSTITUTIONAL_EMAIL_DOMAIN`: domínio permitido, sem `@`; sem configuração aceita qualquer e-mail válido. `MANAGER_INVITE_CODE`: opcional, desligado por padrão conforme especificação. Em produção, configure-o antes de abrir cadastro público. `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`: SMTP; sem host, e-mails são registrados no console. `SEED_PASSWORD`: senha das contas de demonstração.
 
+`ADMIN_EMAIL` e `ADMIN_PASSWORD`: opcionais no seed para criar ou atualizar uma conta de administrador geral; a senha deve ter 12+ caracteres. O cadastro público não aceita `ADMIN_GERAL`. No painel, esse perfil pode executar as ações do gerente, listar contas e alterar perfis. A promoção para gerente ou administrador geral exige CPF já validado no cadastro; a tela não permite remover o perfil de um administrador geral.
+
 ## Arquitetura e decisões
 
 - `app/api`: regras e autorização no servidor. `lib/rules.ts`: cálculo puro de disponibilidade. `prisma`: modelo, migração e dados iniciais. `app/usuario` e `app/gerente`: interfaces.
@@ -48,6 +50,7 @@ O ambiente de testes está em [teste-facul.vercel.app](https://teste-facul.verce
 | RF14–RF15 | `app/api/holidays`, `app/api/locals`, `app/gerente` |
 | RF17 | `lib/mail.ts`, `app/api/manage/bookings/[id]` |
 | RNF01–RNF03 | `app/globals.css`, `components/Calendar.tsx`, `lib/auth.ts`, verificações de perfil nas rotas |
+| Administração geral (evolução solicitada) | `prisma/migrations/20261105000000_admin_geral`, `app/api/admin/users`, `app/gerente`, `lib/http.ts`, testes de acesso |
 
 ## Lacunas conhecidas
 

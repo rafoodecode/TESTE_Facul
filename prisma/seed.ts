@@ -4,6 +4,18 @@ const db = new PrismaClient()
 const password = process.env.SEED_PASSWORD || 'TroqueEstaSenha123!'
 async function main() {
   const senhaHash = await hash(password, 12)
+  if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+    if (process.env.ADMIN_PASSWORD.length < 12) throw new Error('ADMIN_PASSWORD deve ter ao menos 12 caracteres.')
+    await db.user.upsert({
+      where: { email: process.env.ADMIN_EMAIL.toLowerCase() },
+      update: { papel: 'ADMIN_GERAL', senhaHash: await hash(process.env.ADMIN_PASSWORD, 12) },
+      create: {
+        nome: 'Administrador Geral', email: process.env.ADMIN_EMAIL.toLowerCase(), matricula: 'A001',
+        cpf: '11144477735', dataNascimento: new Date('1985-01-01T12:00:00Z'),
+        senhaHash: await hash(process.env.ADMIN_PASSWORD, 12), papel: 'ADMIN_GERAL',
+      },
+    })
+  }
   const year = new Date().getFullYear()
   const manager = await db.user.upsert({ where: { email: 'gerente@instituicao.edu.br' }, update: {}, create: { nome: 'Gerente Demonstração', email: 'gerente@instituicao.edu.br', matricula: 'G001', cpf: '52998224725', dataNascimento: new Date('1980-01-01T12:00:00Z'), senhaHash, papel: 'GERENTE' } })
   const users = []

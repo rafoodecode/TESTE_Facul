@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { currentUser } from './auth'
 export const fail = (message: string, status = 400) => NextResponse.json({ erro: message }, { status })
-export async function requireRole(role: 'USUARIO' | 'GERENTE') {
+export async function requireRole(role: 'USUARIO' | 'GERENTE' | 'ADMIN_GERAL') {
   const user = await currentUser()
   if (!user) return { error: fail('Faça login para continuar.', 401) }
-  if (user.papel !== role) return { error: fail('Acesso não autorizado.', 403) }
+  if (user.papel !== role && !(role === 'GERENTE' && user.papel === 'ADMIN_GERAL')) return { error: fail('Acesso não autorizado.', 403) }
   return { user }
 }
 export function handleError(error: unknown) {

@@ -8,6 +8,7 @@ datasource db {
 enum Papel {
   USUARIO
   GERENTE
+  ADMIN_GERAL
 }
 enum TipoLocal {
   AUDITORIO

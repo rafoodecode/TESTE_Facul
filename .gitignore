@@ -5,6 +5,8 @@ node_modules
 !.env.example
 playwright-report
 test-results
+evidencias
+relatorios
 .npm-cache
 .vercel
 *.tsbuildinfo

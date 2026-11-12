@@ -63,4 +63,34 @@ O ambiente de testes está em [teste-facul.vercel.app](https://teste-facul.verce
 
 Em 05/11/2026: instalação de dependências, geração do cliente Prisma, migração em PostgreSQL 17 isolado, seed, checagem TypeScript, compilação Next.js, 8 testes Vitest e fluxo Playwright no Chrome passaram. O Playwright também confirmou HTTP 409 para reserva duplicada e HTTP 403 para tentativa de confirmação por usuário comum. O banco isolado de validação usa a porta 55432 e sua configuração local está no `.env` ignorado pelo Git.
 
-O teste adicional `e2e/concurrency.spec.ts` cobre a RN09 com duas solicitações simultâneas. Execute isoladamente com `npx playwright test e2e/concurrency.spec.ts`; ele precisa do seed e de um banco disponível.
+O teste anterior `e2e/concurrency.spec.ts` cobre a RN09 com duas solicitações simultâneas e permanece como referência. A configuração atual executa apenas a suíte rastreável em `tests/`.
+
+## Automação de QA da entrega de 17/11
+
+A suíte nova está em `tests/sge.spec.ts`; os fluxos reutilizáveis ficam em `tests/pages/`, a autenticação e limpeza em `tests/fixtures.ts`, e o capturador SMTP local em `tests/support/smtp.ts`. Ela usa somente PostgreSQL em `localhost` ou `127.0.0.1` e inicia o SGE na porta 3100. O banco deve estar migrado. Um Chrome local é usado fora do CI; no GitHub Actions, o fluxo instala Chromium. Instale o vídeo com `npx playwright install ffmpeg`.
+
+```bash
+npm install
+npm run test:smoke
+npm run test:sanity
+npm run test:regression
+python -m pip install -r requirements-qa.txt
+npm run test:report
+```
+
+Cada caso termina em PASS ou FAIL, sem `test.skip` e sem nova tentativa automática. Os títulos contêm ID e tags. A captura de cada caso fica em `evidencias/<ID>.png`; rastros e vídeo ficam em `test-results/` somente para falhas. O relatório baseado no JSON real da última execução sai em `relatorios/` nos formatos Markdown e Word. Execute a regressão completa imediatamente antes de gerar o relatório final, pois uma execução parcial substitui o JSON. O autor do relatório pode ser definido em `QA_AUTOR`.
+
+| Casos | Cobertura |
+|---|---|
+| RF10-CT01/02 | 12 meses e filtro; local inválido |
+| RF11-CT01/02 | resumo do dia com reserva; dia vazio sem resumo antigo |
+| RF12-CT01/02 | legendas e estados; feriado não livre |
+| RF13-CT01/02 | confirmação visível ao usuário; cancelamentos e turno liberado |
+| RN06-CT01/02 | URL direta e API de gestor vedadas ao usuário comum |
+| RF14-CT01/02 | cadastro e remoção de feriado; duplicidade rejeitada |
+| RF15-CT01/02 | cadastro, edição e remoção refletidos ao usuário; remoção com reserva futura vedada |
+| RF17-CT01/02 | e-mail capturado ao confirmar e cancelar |
+
+Os testes usam papéis, rótulos acessíveis e os IDs de seções `#feriados`, `#locais` e `#aprovacoes`. Para reduzir dependência do texto da interface, recomenda-se adicionar `data-testid` a mês da agenda anual, linha da reserva, linha do feriado, linha do local e estado de cada dia. Esses atributos não são necessários para a suíte atual.
+
+Os dois RF novos e seus quatro casos, assim como o Documento de Casos de Teste e o template do relatório, não estavam disponíveis nesta sessão. A suíte cobre apenas os resultados esperados descritos acima. Ao receber os documentos, a matriz e o gerador devem ser ajustados às versões oficiais. A execução local de 12/11/2026 terminou com 16 PASS e 0 FAIL; o relatório classifica o conjunto como aprovado com ressalvas pela lacuna documental. O SMTP local valida a geração e o envio pelo aplicativo até o capturador; não comprova entrega a uma caixa de e-mail externa ou o SMTP do site publicado.

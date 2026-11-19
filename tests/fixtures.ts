@@ -50,13 +50,15 @@ test.beforeAll(async () => {
 test.afterEach(async ({ page }, info) => {
   const id = info.title.match(/[A-Z]+\d*-CT\d+/)?.[0] || 'SEM-ID'
   await mkdir('evidencias', { recursive: true })
-  await (paginaAtiva || page).screenshot({ path: join('evidencias', `${id}.png`), fullPage: true }).catch(() => {})
+  const paginaEvidencia = /\/(gerente|usuario)(?:\?|$)/.test(page.url()) ? page : (paginaAtiva || page)
+  await paginaEvidencia.screenshot({ path: join('evidencias', `${id}.png`), fullPage: true }).catch(() => {})
   paginaAtiva = undefined
   // Remove só os registros criados pelo caso, mesmo quando uma asserção falha.
   const marcador = `QA-${id}-`
   await db.reserva.deleteMany({ where: { nomeEvento: { startsWith: marcador } } })
   await db.feriado.deleteMany({ where: { descricao: { startsWith: marcador } } })
   await db.local.deleteMany({ where: { nome: { startsWith: marcador } } })
+  await db.user.deleteMany({ where: { matricula: { startsWith: marcador } } })
 })
 
 export { expect }

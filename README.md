@@ -94,3 +94,7 @@ Cada caso termina em PASS ou FAIL, sem `test.skip` e sem nova tentativa automát
 Os testes usam papéis, rótulos acessíveis e os IDs de seções `#feriados`, `#locais` e `#aprovacoes`. Para reduzir dependência do texto da interface, recomenda-se adicionar `data-testid` a mês da agenda anual, linha da reserva, linha do feriado, linha do local e estado de cada dia. Esses atributos não são necessários para a suíte atual.
 
 Os dois RF novos e seus quatro casos, assim como o Documento de Casos de Teste e o template do relatório, não estavam disponíveis nesta sessão. A suíte cobre apenas os resultados esperados descritos acima. Ao receber os documentos, a matriz e o gerador devem ser ajustados às versões oficiais. A execução local de 12/11/2026 terminou com 16 PASS e 0 FAIL; o relatório classifica o conjunto como aprovado com ressalvas pela lacuna documental. O SMTP local valida a geração e o envio pelo aplicativo até o capturador; não comprova entrega a uma caixa de e-mail externa ou o SMTP do site publicado.
+
+## Validação geral de sete fluxos
+
+Execute `npm run test:geral` para os sete casos integrados `SGE-CT01` a `SGE-CT07`, com banco PostgreSQL local migrado. O plano, os resultados reais, as evidências e as limitações estão em [docs/VALIDACAO_GERAL_7_TESTES.md](docs/VALIDACAO_GERAL_7_TESTES.md). Para emitir um relatório separado da suíte de 16 casos, defina `QA_RELATORIO_NOME=Validacao_Geral_7_Testes` e `QA_RELATORIO_LACUNA` antes de `npm run test:report`.

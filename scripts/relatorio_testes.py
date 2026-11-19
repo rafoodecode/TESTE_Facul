@@ -14,6 +14,8 @@ from docx.oxml import OxmlElement
 RAIZ = Path(__file__).resolve().parent.parent
 ENTRADA = RAIZ / "test-results" / "resultados.json"
 SAIDA = RAIZ / "relatorios"
+NOME = os.getenv("QA_RELATORIO_NOME", "Relatorio_Execucao_Casos_de_Teste")
+LACUNA = os.getenv("QA_RELATORIO_LACUNA", "Os dois RF novos e o template citado aguardam os documentos de referência para ampliar a matriz.")
 
 
 def coletar(suites):
@@ -70,8 +72,8 @@ def main():
     recomendacao = "Revise cada falha e sua captura antes da entrega." if falharam else "Nenhuma falha foi identificada nos casos executados."
     linhas += ["", "## V. Conclusão e Recomendações", "", f"Resultado: **{decisao}**.",
               "", f"A classificação considera somente os casos executados. {recomendacao}",
-              "Os dois RF novos e o template citado aguardam os documentos de referência para ampliar a matriz.", ""]
-    (SAIDA / "Relatorio_Execucao_Casos_de_Teste.md").write_text("\n".join(linhas), encoding="utf-8")
+              LACUNA, ""]
+    (SAIDA / f"{NOME}.md").write_text("\n".join(linhas), encoding="utf-8")
 
     doc = Document()
     sec = doc.sections[0]; sec.top_margin = Cm(2); sec.bottom_margin = Cm(2)
@@ -79,6 +81,8 @@ def main():
     normal = doc.styles["Normal"]; normal.font.name = "Aptos"; normal.font.size = Pt(9)
     titulo = doc.styles["Title"]; titulo.font.color.rgb = RGBColor(0, 0, 0)
     titulo.font.name = "Aptos"; titulo.font.size = Pt(21)
+    for nivel in ("Heading 1", "Heading 2"):
+        doc.styles[nivel].font.color.rgb = RGBColor(0, 0, 0)
     if titulo._element.pPr is not None:
         for borda in titulo._element.pPr.findall(qn("w:pBdr")):
             titulo._element.pPr.remove(borda)
@@ -104,8 +108,8 @@ def main():
     if not defeitos:
         for celula, valor in zip(tabela.add_row().cells, ["—", "—", "Nenhum defeito identificado nesta execução.", "—"]): celula.text = valor
     doc.add_heading("V Conclusão e Recomendações", level=1)
-    doc.add_paragraph(f"Resultado: {decisao}. {recomendacao} Os dois RF novos e o template citado aguardam os documentos de referência.")
-    doc.save(SAIDA / "Relatorio_Execucao_Casos_de_Teste.docx")
+    doc.add_paragraph(f"Resultado: {decisao}. {recomendacao} {LACUNA}")
+    doc.save(SAIDA / f"{NOME}.docx")
     print(f"Relatório gerado: {len(casos)} casos, {passaram} PASS, {falharam} FAIL.")
 
 

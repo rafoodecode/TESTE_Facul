@@ -6,13 +6,13 @@ Este roteiro responde aos tópicos legíveis nas duas imagens enviadas em 19/11/
 
 | Categoria | Para que serve | Exemplo real no projeto | Comando |
 |---|---|---|---|
-| Smoke | Conferir rapidamente se o fluxo essencial está utilizável. | `RF13-CT01`: o gestor confirma uma solicitação e o usuário vê o novo status. | `npm run test:smoke` |
-| Sanity | Verificar uma funcionalidade específica após alteração. | `RF14-CT01`: cadastrar um feriado bloqueia a data e removê-lo libera a data. | `npm run test:sanity` |
-| Regression | Conferir novamente comportamentos existentes após mudanças. | `RF15-CT01`: cadastro, edição e remoção de local continuam aparecendo corretamente para o usuário. | `npm run test:regression` |
+| Smoke | Conferir rapidamente se o fluxo essencial está utilizável. | `RBT-CT03`: o gestor confirma uma solicitação e o usuário vê o novo status. | `npm run test:robot -- --include smoke` |
+| Sanity | Verificar uma funcionalidade específica após alteração. | `RBT-CT05`: cadastrar um feriado bloqueia a data e removê-lo libera a data. | `npm run test:robot -- --include sanity` |
+| Regression | Conferir novamente comportamentos existentes após mudanças. | `RBT-CT06`: cadastro, edição e remoção de local continuam aparecendo corretamente para o usuário. | `npm run test:robot -- --include regression` |
 
-**Fala sugerida:** “Smoke é a checagem rápida do caminho principal; sanity olha com foco uma mudança; regression verifica se o conjunto de funções continua correto. Um caso pode pertencer a mais de uma categoria. As sete verificações integradas `SGE-CT01` a `SGE-CT07` estão marcadas como `@regression`; os exemplos de smoke e sanity estão na suíte rastreável `tests/sge.spec.ts`.”
+**Fala sugerida:** “Smoke é a checagem rápida do caminho principal; sanity olha com foco uma mudança; regression verifica se o conjunto de funções continua correto. Um caso pode pertencer a mais de uma categoria. Todos os sete casos Robot têm a tag `regression`; os casos críticos também têm `smoke` e os casos de funcionalidades alteradas têm `sanity`.”
 
-Os títulos dos testes contêm tags e IDs. O Playwright seleciona os casos com `--grep` nos scripts do `package.json`. Não use o resultado 7/7 para afirmar que toda a regressão de 23 casos foi executada nessa mesma rodada: ele descreve a suíte `test:geral`.
+Os títulos Robot contêm IDs e cada caso declara tags. O Robot filtra com `--include`. O resultado 7/7 descreve somente a suíte `tests/robot/sge.robot`, não os demais testes Playwright do projeto.
 
 ## 2. Backend: tecnologias e um método central
 
@@ -39,19 +39,21 @@ Os títulos dos testes contêm tags e IDs. O Playwright seleciona os casos com `
 
 | Integrante | Caso para explicar | Ação e asserção em Playwright | Evidência |
 |---|---|---|---|
-| 1 | `SGE-CT01` | `page.request.post` verifica login inválido com HTTP 401; URL direta e API de gestor são bloqueadas ao usuário. | [`SGE-CT01.png`](../evidencias/SGE-CT01.png) |
-| 2 | `SGE-CT02` | `getByRole` conta 12 meses; `UsuarioPage.solicitar` cria pedido; `expect` verifica `PENDENTE` e HTTP 409 na duplicidade. | [`SGE-CT02.png`](../evidencias/SGE-CT02.png) |
-| 3 | `SGE-CT03` | O botão `Confirmar` atualiza o status; `expect.poll` espera a mensagem no capturador SMTP local. | [`SGE-CT03.png`](../evidencias/SGE-CT03.png) |
-| 4 | `SGE-CT05` | `GestorPage.cadastrarFeriado` usa a interface; a API recusa a reserva no feriado com HTTP 400; a remoção libera a data. | [`SGE-CT05.png`](../evidencias/SGE-CT05.png) |
+| 1 | `RBT-CT01` | `Abrir Painel` entra com a conta; `Wait Until Location Contains` confere o redirecionamento; `Should Be Equal As Integers` valida HTTP 401 e 403. | [`RBT-CT01.png`](../evidencias/RBT-CT01.png) |
+| 2 | `RBT-CT02` | `Contar Meses Da Agenda` confirma 12 meses; `Solicitar Reserva Pela Tela` faz o pedido; `Should Contain` e HTTP 409 verificam pendência e conflito. | [`RBT-CT02.png`](../evidencias/RBT-CT02.png) |
+| 3 | `RBT-CT03` | `Confirmar Reserva Pela Tela` altera o status; `Wait Until Keyword Succeeds` espera o aviso no capturador SMTP local. | [`RBT-CT03.png`](../evidencias/RBT-CT03.png) |
+| 4 | `RBT-CT05` | `Input Text` e `Click Button` cadastram o feriado; HTTP 400 bloqueia a reserva; `Feriado Deve Estar Removido` confirma a remoção. | [`RBT-CT05.png`](../evidencias/RBT-CT05.png) |
 
-Se houver menos integrantes, distribua os exemplos conforme o grupo. Os outros três casos são: `SGE-CT04` (cancelamento), `SGE-CT06` (locais) e `SGE-CT07` (Admin Geral). O [relatório acadêmico](../relatorios/Relatorio_Academico_7_Testes.md) explica os sete casos, um por parte.
+Se houver menos integrantes, distribua os exemplos conforme o grupo. Os outros três casos são: `RBT-CT04` (cancelamento), `RBT-CT06` (locais) e `RBT-CT07` (Admin Geral). O [relatório Robot](../relatorios/Relatorio_Robot_7_Testes.md) explica os sete casos, um por parte.
 
-**Recursos usados de fato:** fixtures de login para gestor e usuário, Page Object Model em `tests/pages/`, seletores por papel e rótulo, asserções `expect`, consulta de API, espera `expect.poll`, capturas em `evidencias/` e limpeza de dados após cada caso. Trace e vídeo são guardados apenas quando um teste falha.
+**Recursos Robot usados de fato:** `Test Setup` e `Test Teardown`, tags, palavras-chave próprias, SeleniumLibrary, asserções `Should Be Equal` e `Should Contain`, `Wait Until Keyword Succeeds`, capturas em `evidencias/`, além de `report.html`, `log.html` e `output.xml`. A biblioteca Python prepara e limpa os dados de cada caso.
 
-## 5. Atenção à menção a Robot Framework
+## 5. Testes automatizados em Robot Framework
 
-A segunda imagem pede exemplos de testes automatizados **em Robot**. O projeto atual usa **Playwright com TypeScript**, como mostram [`package.json`](../package.json), [`playwright.config.ts`](../playwright.config.ts) e os arquivos em `tests/`. Nenhum dos sete casos foi executado em Robot Framework. Na apresentação, descrevam os recursos do Playwright acima e não atribuam a ele palavras-chave ou relatórios do Robot. Se Robot Framework for um critério obrigatório da avaliação, será preciso implementar e executar uma suíte Robot separada antes de afirmar que esse item foi atendido.
+Após as imagens, os sete fluxos foram migrados para [Robot Framework](../tests/robot/sge.robot) com SeleniumLibrary. A execução local de 19/11/2026 registrou **7 PASS e 0 FAIL**. Para a parte da apresentação que pede Robot, mostrem o [relatório em sete partes](../relatorios/Relatorio_Robot_7_Testes.md), o `robot-results/report.html` e exemplos de palavras-chave como `Input Text`, `Click Button`, `Wait Until Page Contains Element` e `Should Be Equal As Integers`. A biblioteca Python `SgeSupport.py` prepara dados isolados, chama APIs e consulta o capturador SMTP. Os relatórios Robot incluem a sequência de palavras-chave, e cada caso salva uma captura `RBT-CTxx.png`.
+
+Os exemplos Playwright da seção 4 e o relatório anterior continuam válidos como histórico de outra suíte. Durante a fala sobre Robot, usem os IDs `RBT-CT01` a `RBT-CT07` e as capturas correspondentes, sem misturar resultados das duas execuções.
 
 ## 6. Resultado que pode ser afirmado
 
-Na execução local documentada em 18/11/2026, os sete casos `SGE-CT01` a `SGE-CT07` passaram. Os 11 testes unitários Vitest e o build de produção também passaram nessa validação. O e-mail foi recebido por um capturador SMTP **local**; o relatório não comprova a entrega em caixa externa nem a homologação do site publicado.
+Na execução local documentada em 18/11/2026, os sete casos Playwright `SGE-CT01` a `SGE-CT07` passaram. Na nova execução Robot de 19/11/2026, os sete casos `RBT-CT01` a `RBT-CT07` também passaram. Os 11 testes unitários Vitest e o build de produção passaram na validação anterior. O e-mail foi recebido por um capturador SMTP **local**; os relatórios não comprovam a entrega em caixa externa nem a homologação do site publicado.

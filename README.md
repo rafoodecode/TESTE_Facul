@@ -102,3 +102,20 @@ Execute `npm run test:geral` para os sete casos integrados `SGE-CT01` a `SGE-CT0
 Para apresentação acadêmica, consulte [relatorios/Relatorio_Academico_7_Testes.md](relatorios/Relatorio_Academico_7_Testes.md), [Word](relatorios/Relatorio_Academico_7_Testes.docx) ou [PDF](relatorios/Relatorio_Academico_7_Testes.pdf). O relatório tem uma parte por teste e pode ser recriado com o Python empacotado e `scripts/gerar_relatorio_academico.py`.
 
 O [roteiro para apresentação da faculdade](docs/ROTEIRO_APRESENTACAO_FACULDADE.md) relaciona exemplos de smoke, sanity e regression, um método do backend, as telas centrais e os recursos Playwright usados. O roteiro esclarece a diferença entre o Playwright implementado e a menção a Robot Framework no material da disciplina.
+
+## Suíte Robot Framework
+
+Os sete fluxos `RBT-CT01` a `RBT-CT07` foram implementados também em [tests/robot/sge.robot](tests/robot/sge.robot), com SeleniumLibrary e palavras-chave auxiliares em `tests/robot/SgeSupport.py`. Para executar em PostgreSQL local migrado:
+
+```bash
+python -m venv .venv-robot
+.venv-robot/Scripts/python -m pip install -r requirements-robot.txt
+npm run test:robot
+python scripts/relatorio_robot.py
+```
+
+No Linux, use `.venv-robot/bin/python` no segundo comando. O Chrome deve estar instalado; o Selenium pode obter o ChromeDriver automaticamente. Nesta máquina Windows foi necessário baixar um [ChromeDriver oficial](https://googlechromelabs.github.io/chrome-for-testing/) compatível com a versão principal do Chrome e colocar o executável em `.robot-bin/chromedriver-win64/chromedriver.exe`. O executor inicia o SGE e o capturador SMTP nas portas locais 3100, 1025 e 1026; recusa `DATABASE_URL` fora de localhost. Os casos criam registros com prefixo `QA-RBT-CT` e os removem no teardown, inclusive quando falham. As capturas ficam em `evidencias/RBT-CTxx.png`, e os relatórios nativos em `robot-results/`.
+
+A execução local de 19/11/2026 terminou com **7 PASS e 0 FAIL**, conforme `robot-results/output.xml`. O relatório didático está em [relatorios/Relatorio_Robot_7_Testes.md](relatorios/Relatorio_Robot_7_Testes.md). A suíte Playwright continua disponível como referência anterior; seus resultados não são somados ao total da execução Robot.
+
+Para filtrar por categoria, use `npm run test:robot -- --include smoke`, `--include sanity` ou `--include regression`. O relatório de sete partes deve ser gerado após uma execução completa, pois o XML de uma execução filtrada contém menos casos.

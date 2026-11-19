@@ -10,3 +10,8 @@ relatorios
 .npm-cache
 .vercel
 *.tsbuildinfo
+.venv-robot/
+robot-results/
+.robot-bin/
+__pycache__/
+*.pyc

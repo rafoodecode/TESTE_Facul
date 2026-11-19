@@ -98,3 +98,5 @@ Os dois RF novos e seus quatro casos, assim como o Documento de Casos de Teste e
 ## Validação geral de sete fluxos
 
 Execute `npm run test:geral` para os sete casos integrados `SGE-CT01` a `SGE-CT07`, com banco PostgreSQL local migrado. O plano, os resultados reais, as evidências e as limitações estão em [docs/VALIDACAO_GERAL_7_TESTES.md](docs/VALIDACAO_GERAL_7_TESTES.md). Para emitir um relatório separado da suíte de 16 casos, defina `QA_RELATORIO_NOME=Validacao_Geral_7_Testes` e `QA_RELATORIO_LACUNA` antes de `npm run test:report`.
+
+Para apresentação acadêmica, consulte [relatorios/Relatorio_Academico_7_Testes.md](relatorios/Relatorio_Academico_7_Testes.md), [Word](relatorios/Relatorio_Academico_7_Testes.docx) ou [PDF](relatorios/Relatorio_Academico_7_Testes.pdf). O relatório tem uma parte por teste e pode ser recriado com o Python empacotado e `scripts/gerar_relatorio_academico.py`.
